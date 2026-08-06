@@ -71,40 +71,49 @@
     <div class="card-header py-3 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
             <i class="fas fa-file-alt mr-2 text-primary"></i>
-            <h6 class="m-0 font-weight-bold text-primary">{{ $judul }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Hasil Laporan</h6>
         </div>
         <div>
-            <form action="{{ route('laporan-barang-keluar.download-word') }}" method="POST" style="display:inline;">
+            <!-- Tombol Cetak -->
+            <button onclick="cetakLaporan()" class="btn btn-success btn-sm mr-1">
+                <i class="fas fa-print mr-1"></i> Cetak
+            </button>
+
+            <!-- Form Download PDF -->
+            <form action="{{ route('laporan-barang-keluar.download-pdf') }}" method="POST" style="display:inline;">
                 @csrf
                 <input type="hidden" name="kategori" value="{{ $request->kategori }}">
                 <input type="hidden" name="tanggal_dari" value="{{ $request->tanggal_dari }}">
                 <input type="hidden" name="tanggal_sampai" value="{{ $request->tanggal_sampai }}">
-                <button type="submit" class="btn btn-primary btn-sm mr-1">
-                    <i class="fas fa-file-word mr-1"></i> Download Word
-                </button>
-            </form>
-            <form action="{{ route('laporan-barang-keluar.download-excel') }}" method="POST" style="display:inline;">
-                @csrf
-                <input type="hidden" name="kategori" value="{{ $request->kategori }}">
-                <input type="hidden" name="tanggal_dari" value="{{ $request->tanggal_dari }}">
-                <input type="hidden" name="tanggal_sampai" value="{{ $request->tanggal_sampai }}">
-                <button type="submit" class="btn btn-success btn-sm">
-                    <i class="fas fa-file-excel mr-1"></i> Download Excel
+                <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="fas fa-file-pdf mr-1"></i> Download PDF
                 </button>
             </form>
         </div>
     </div>
-    <div class="card-body">
+    
+    <div class="card-body" id="area-cetak">
+        
+        <!-- Header Judul untuk Hasil Print -->
+        <div class="text-center mb-4">
+            <h5 class="font-weight-bold" style="line-height: 1.5; text-transform: uppercase;">
+                LAPORAN BARANG KELUAR<br>
+                KAPAL NEGARA PRAJAPATI<br>
+                TANGGAL {{ \Carbon\Carbon::parse($request->tanggal_dari)->format('d/m/Y') }} S/D {{ \Carbon\Carbon::parse($request->tanggal_sampai)->format('d/m/Y') }}<br>
+                JENIS: {{ $request->kategori == 'semua' ? 'SEMUA JENIS' : $request->kategori }}
+            </h5>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-bordered" width="100%" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
-                        <th width="50px" class="text-center">No</th>
-                        <th class="text-center">Tanggal</th>
-                        <th>Nama Barang</th>
-                        <th class="text-center">Satuan</th>
-                        <th class="text-center">Jumlah Keluar</th>
-                        <th>Keterangan</th>
+                        <th width="50px" class="text-center align-middle">No</th>
+                        <th class="text-center align-middle">Tanggal</th>
+                        <th class="align-middle">Nama Barang</th>
+                        <th class="text-center align-middle">Satuan</th>
+                        <th class="text-center align-middle">Jumlah Keluar</th>
+                        <th class="align-middle">Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -119,7 +128,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted">Tidak ada data barang keluar untuk filter ini.</td>
+                        <td colspan="6" class="text-center text-muted">Tidak ada data transaksi selesai untuk filter ini.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -129,4 +138,26 @@
 </div>
 @endisset
 
+@endsection
+
+@section('scripts')
+<script>
+    function cetakLaporan() {
+        const areaCetak = document.getElementById('area-cetak').innerHTML;
+        const windowCetak = window.open('', '', 'height=800,width=1000');
+        
+        windowCetak.document.write('<html><head><title>Laporan Barang Keluar</title>');
+        windowCetak.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css">');
+        windowCetak.document.write('<style>body { padding: 20px; font-family: sans-serif; color: #000; } .table th { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; vertical-align: middle !important; }</style>');
+        windowCetak.document.write('</head><body>');
+        windowCetak.document.write(areaCetak);
+        windowCetak.document.write('</body></html>');
+        windowCetak.document.close();
+        
+        setTimeout(() => {
+            windowCetak.focus();
+            windowCetak.print();
+        }, 500);
+    }
+</script>
 @endsection

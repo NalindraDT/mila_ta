@@ -71,30 +71,35 @@
     <div class="card-header py-3 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
             <i class="fas fa-file-alt mr-2 text-primary"></i>
-            <h6 class="m-0 font-weight-bold text-primary">{{ $judul }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Hasil Laporan</h6>
         </div>
         <div>
-            <form action="{{ route('laporan-barang-masuk.download-word') }}" method="POST" style="display:inline;">
+            <!-- Tombol Cetak -->
+            <button onclick="cetakLaporan()" class="btn btn-success btn-sm mr-1">
+                <i class="fas fa-print mr-1"></i> Cetak
+            </button>
+
+            <!-- Form Download PDF -->
+            <form action="{{ route('laporan-barang-masuk.download-pdf') }}" method="POST" style="display:inline;">
                 @csrf
                 <input type="hidden" name="kategori" value="{{ $request->kategori }}">
                 <input type="hidden" name="tanggal_dari" value="{{ $request->tanggal_dari }}">
                 <input type="hidden" name="tanggal_sampai" value="{{ $request->tanggal_sampai }}">
-                <button type="submit" class="btn btn-primary btn-sm mr-1">
-                    <i class="fas fa-file-word mr-1"></i> Download Word
-                </button>
-            </form>
-            <form action="{{ route('laporan-barang-masuk.download-excel') }}" method="POST" style="display:inline;">
-                @csrf
-                <input type="hidden" name="kategori" value="{{ $request->kategori }}">
-                <input type="hidden" name="tanggal_dari" value="{{ $request->tanggal_dari }}">
-                <input type="hidden" name="tanggal_sampai" value="{{ $request->tanggal_sampai }}">
-                <button type="submit" class="btn btn-success btn-sm">
-                    <i class="fas fa-file-excel mr-1"></i> Download Excel
+                <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="fas fa-file-pdf mr-1"></i> Download PDF
                 </button>
             </form>
         </div>
     </div>
-    <div class="card-body">
+    
+    <!-- ID area-cetak ditambahkan di sini -->
+    <div class="card-body" id="area-cetak">
+        
+        <!-- Header Judul untuk Hasil Print -->
+        <div class="text-center mb-4">
+            <h5 class="font-weight-bold" style="line-height: 1.5;">{!! nl2br(e($judul)) !!}</h5>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-bordered" width="100%" cellspacing="0">
                 <thead class="thead-light">
@@ -117,7 +122,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted">Tidak ada data barang masuk untuk filter ini.</td>
+                        <td colspan="5" class="text-center text-muted">Tidak ada data transaksi selesai untuk filter ini.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -126,16 +131,25 @@
 
         <hr>
         <h6 class="font-weight-bold mb-3"><i class="fas fa-images mr-1"></i> Foto Bukti Penerimaan</h6>
-        @if($fotos->isEmpty())
+        
+        @php
+            // Ambil item yang punya foto bukti
+            $itemsWithFoto = $items->whereNotNull('foto_bukti');
+        @endphp
+
+        @if($itemsWithFoto->isEmpty())
             <p class="text-muted mb-0">Belum ada foto bukti untuk periode ini.</p>
         @else
             <div class="row">
-                @foreach ($fotos as $foto)
-                <div class="col-md-3 col-sm-4 col-6 mb-3">
-                    <img src="{{ asset('storage/' . $foto->path_foto) }}"
-                        class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;"
+                @foreach ($itemsWithFoto as $item)
+                <div class="col-md-3 col-sm-4 col-6 mb-4 text-center">
+                    <img src="{{ asset('storage/' . $item->foto_bukti) }}"
+                        class="img-fluid rounded border shadow-sm" style="height: 180px; width: 100%; object-fit: cover;"
                         alt="Foto Bukti">
-                    <p class="small text-muted mb-0 mt-1">{{ \Carbon\Carbon::parse($foto->tanggal_masuk)->format('d/m/Y') }}</p>
+                    <p class="small text-dark mb-0 mt-2">
+                        <strong>{{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d/m/Y') }}</strong><br>
+                        {{ $item->barang->nama_barang ?? '-' }}
+                    </p>
                 </div>
                 @endforeach
             </div>
@@ -144,4 +158,29 @@
 </div>
 @endisset
 
+@endsection
+
+@section('scripts')
+<script>
+    function cetakLaporan() {
+        const areaCetak = document.getElementById('area-cetak').innerHTML;
+        const windowCetak = window.open('', '', 'height=800,width=1000');
+        
+        windowCetak.document.write('<html><head><title>Laporan Barang Masuk</title>');
+        // Memuat styling Bootstrap agar tabel rapi saat di print
+        windowCetak.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css">');
+        // Tambahan styling khusus print untuk margin dan foto
+        windowCetak.document.write('<style>body { padding: 20px; font-family: sans-serif; color: #000; } img { max-height: 200px; object-fit: cover; } .table th { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; }</style>');
+        windowCetak.document.write('</head><body>');
+        windowCetak.document.write(areaCetak);
+        windowCetak.document.write('</body></html>');
+        windowCetak.document.close();
+        
+        // Timeout sedikit sebelum print agar gambar (foto bukti) sempat ter-load sempurna di window baru
+        setTimeout(() => {
+            windowCetak.focus();
+            windowCetak.print();
+        }, 800);
+    }
+</script>
 @endsection

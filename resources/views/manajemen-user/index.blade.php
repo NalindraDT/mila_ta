@@ -44,10 +44,14 @@
                         <td>{{ $u->nama_user }}</td>
                         <td>{{ $u->username }}</td>
                         <td>
-                            @if($u->role == 'Administrator')
-                                <span class="badge badge-primary">Administrator</span>
+                            @if($u->role == 'Kepala Gudang')
+                                <span class="badge badge-primary">Kepala Gudang</span>
+                            @elseif($u->role == 'Admin Gudang')
+                                <span class="badge badge-info">Admin Gudang</span>
+                            @elseif($u->role == 'Staff')
+                                <span class="badge badge-secondary">Staff</span>
                             @else
-                                <span class="badge badge-info">Kepala Gudang</span>
+                                <span class="badge badge-dark">{{ $u->role }}</span>
                             @endif
                         </td>
                         <td class="text-center" style="white-space: nowrap;">

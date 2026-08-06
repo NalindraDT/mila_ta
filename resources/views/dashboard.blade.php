@@ -4,6 +4,16 @@
 
 @section('content')
 
+@php
+// Mapping label & warna badge status, dipakai bareng di tabel Barang Masuk & Barang Keluar
+$statusBadge = [
+    'pending'   => ['label' => 'Pending',    'class' => 'badge-warning text-dark'],
+    'acc_admin' => ['label' => 'ACC Admin',  'class' => 'badge-info'],
+    'selesai'   => ['label' => 'Selesai',    'class' => 'badge-success'],
+    'ditolak'   => ['label' => 'Ditolak',    'class' => 'badge-danger'],
+];
+@endphp
+
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
 </div>
@@ -41,7 +51,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Barang Masuk</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalMasuk }} Transaksi</div>
-                        <small class="text-muted">Total: {{ $totalJumlahMasuk }} barang masuk</small>
+                        <small class="text-muted">Total: {{ $totalJumlahMasuk }} barang masuk (status selesai)</small>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-arrow-circle-down fa-2x text-gray-300"></i>
@@ -60,7 +70,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Barang Keluar</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalKeluar }} Transaksi</div>
-                        <small class="text-muted">Total: {{ $totalJumlahKeluar }} barang keluar</small>
+                        <small class="text-muted">Total: {{ $totalJumlahKeluar }} barang keluar (status selesai)</small>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-arrow-circle-up fa-2x text-gray-300"></i>
@@ -214,13 +224,18 @@
                 <div class="row mb-3">
                     <div class="col-6 text-center">
                         <div class="h4 font-weight-bold text-success">{{ $totalMasuk }}</div>
-                        <small class="text-muted">Total Transaksi</small>
+                        <small class="text-muted">Total Transaksi Selesai</small>
                     </div>
                     <div class="col-6 text-center">
                         <div class="h4 font-weight-bold text-success">{{ $totalJumlahMasuk }}</div>
-                        <small class="text-muted">Total Barang Masuk</small>
+                        <small class="text-muted">Total Barang Masuk (Selesai)</small>
                     </div>
                 </div>
+                <p class="text-muted small mb-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Tabel di bawah menampilkan seluruh riwayat transaksi (semua status). Hanya transaksi berstatus
+                    <span class="badge badge-success">Selesai</span> yang dihitung pada statistik di atas dan memengaruhi stok.
+                </p>
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm table-hover">
                         <thead class="thead-light">
@@ -229,6 +244,7 @@
                                 <th>Tanggal</th>
                                 <th>Nama Barang</th>
                                 <th>Jumlah Masuk</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -237,10 +253,19 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ \Carbon\Carbon::parse($bm->tanggal_masuk)->format('d/m/Y') }}</td>
                                 <td>{{ $bm->barang->nama_barang ?? '-' }}</td>
-                                <td><span class="badge badge-success">+{{ $bm->jumlah_masuk }}</span></td>
+                                <td>
+                                    <span class="badge {{ $bm->status == 'selesai' ? 'badge-success' : 'badge-secondary' }}">
+                                        +{{ $bm->jumlah_masuk }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ $statusBadge[$bm->status]['class'] ?? 'badge-secondary' }}">
+                                        {{ $statusBadge[$bm->status]['label'] ?? ucfirst($bm->status) }}
+                                    </span>
+                                </td>
                             </tr>
                             @empty
-                            <tr><td colspan="4" class="text-center text-muted">Belum ada data barang masuk.</td></tr>
+                            <tr><td colspan="5" class="text-center text-muted">Belum ada data barang masuk.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -265,13 +290,18 @@
                 <div class="row mb-3">
                     <div class="col-6 text-center">
                         <div class="h4 font-weight-bold text-warning">{{ $totalKeluar }}</div>
-                        <small class="text-muted">Total Transaksi</small>
+                        <small class="text-muted">Total Transaksi Selesai</small>
                     </div>
                     <div class="col-6 text-center">
                         <div class="h4 font-weight-bold text-warning">{{ $totalJumlahKeluar }}</div>
-                        <small class="text-muted">Total Barang Keluar</small>
+                        <small class="text-muted">Total Barang Keluar (Selesai)</small>
                     </div>
                 </div>
+                <p class="text-muted small mb-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Tabel di bawah menampilkan seluruh riwayat transaksi (semua status). Hanya transaksi berstatus
+                    <span class="badge badge-success">Selesai</span> yang dihitung pada statistik di atas dan memengaruhi stok.
+                </p>
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm table-hover">
                         <thead class="thead-light">
@@ -280,6 +310,7 @@
                                 <th>Tanggal</th>
                                 <th>Nama Barang</th>
                                 <th>Jumlah Keluar</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -288,10 +319,19 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ \Carbon\Carbon::parse($bk->tanggal_keluar)->format('d/m/Y') }}</td>
                                 <td>{{ $bk->barang->nama_barang ?? '-' }}</td>
-                                <td><span class="badge badge-warning">-{{ $bk->jumlah_keluar }}</span></td>
+                                <td>
+                                    <span class="badge {{ $bk->status == 'selesai' ? 'badge-warning' : 'badge-secondary' }}">
+                                        -{{ $bk->jumlah_keluar }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ $statusBadge[$bk->status]['class'] ?? 'badge-secondary' }}">
+                                        {{ $statusBadge[$bk->status]['label'] ?? ucfirst($bk->status) }}
+                                    </span>
+                                </td>
                             </tr>
                             @empty
-                            <tr><td colspan="4" class="text-center text-muted">Belum ada data barang keluar.</td></tr>
+                            <tr><td colspan="5" class="text-center text-muted">Belum ada data barang keluar.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

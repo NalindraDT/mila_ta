@@ -19,6 +19,9 @@ class BarangMasuk extends Model
         'jumlah_masuk',
         'tanggal_masuk',
         'stok_sesudah',
+        'status',
+        'catatan_verifikasi',
+        'foto_bukti' // Kolom baru untuk menampung path gambar
     ];
 
     public function barang()

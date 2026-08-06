@@ -19,6 +19,8 @@ class BarangKeluar extends Model
         'tanggal_keluar',
         'keterangan',
         'stok_sesudah_keluar',
+        'status',
+        'catatan_verifikasi',
     ];
 
     public function barang()

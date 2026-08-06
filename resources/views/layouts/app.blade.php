@@ -38,7 +38,7 @@
 
             <hr class="sidebar-divider my-0">
 
-            <!-- Dashboard (semua role) -->
+            <!-- Dashboard (Semua Role) -->
             <li class="nav-item {{ request()->is('/') || request()->is('dashboard') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('dashboard') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -72,7 +72,8 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Kelola:</h6>
 
-                        @if(auth()->user()->role == 'Administrator')
+                        <!-- Master Data: Hanya untuk Kepala Gudang -->
+                        @if(auth()->user()->role == 'Kepala Gudang')
                         <a class="collapse-item {{ request()->is('satuan*') ? 'active' : '' }}" href="{{ route('satuan.index') }}">
                             <i class="fas fa-ruler-combined mr-1"></i> Satuan
                         </a>
@@ -84,6 +85,7 @@
                         </a>
                         @endif
 
+                        <!-- Data Barang: Bisa dilihat semua role -->
                         <a class="collapse-item {{ request()->is('barang') || request()->is('barang/create') || request()->is('barang/*/edit') ? 'active' : '' }}" href="{{ route('barang.index') }}">
                             <i class="fas fa-barcode mr-1"></i> Data Barang
                         </a>
@@ -95,7 +97,7 @@
 
             <div class="sidebar-heading">Transaksi</div>
 
-            <!-- Barang Masuk (semua role) -->
+            <!-- Barang Masuk (Semua role: Staff untuk input, Admin/Kepala untuk ACC) -->
             <li class="nav-item {{ request()->is('barang-masuk*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('barang-masuk.index') }}">
                     <i class="fas fa-fw fa-arrow-circle-down"></i>
@@ -103,7 +105,7 @@
                 </a>
             </li>
 
-            <!-- Barang Keluar (semua role) -->
+            <!-- Barang Keluar (Semua role) -->
             <li class="nav-item {{ request()->is('barang-keluar*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('barang-keluar.index') }}">
                     <i class="fas fa-fw fa-arrow-circle-up"></i>
@@ -111,9 +113,11 @@
                 </a>
             </li>
 
+            <!-- Laporan: Hanya untuk Admin Gudang & Kepala Gudang -->
+            @if(in_array(auth()->user()->role, ['Admin Gudang', 'Kepala Gudang']))
             <hr class="sidebar-divider">
 
-            <div class="sidebar-heading">Laporan & Akun</div>
+            <div class="sidebar-heading">Laporan</div>
 
             @php
                 $isLaporanStokActive   = request()->is('laporan');
@@ -122,7 +126,7 @@
                 $isLaporanActive       = $isLaporanStokActive || $isLaporanMasukActive || $isLaporanKeluarActive;
             @endphp
 
-            <!-- Menu Laporan (semua role) -->
+            <!-- Menu Laporan -->
             <li class="nav-item {{ $isLaporanActive ? 'active' : '' }}">
                 <a class="nav-link {{ $isLaporanActive ? '' : 'collapsed' }}"
                     href="#"
@@ -151,13 +155,27 @@
                     </div>
                 </div>
             </li>
+            @endif
 
-            @if(auth()->user()->role == 'Administrator')
-            <!-- Manajemen User (administrator only) -->
+            <!-- Pengaturan Sistem: Hanya untuk Kepala Gudang -->
+            @if(auth()->user()->role == 'Kepala Gudang')
+            <hr class="sidebar-divider">
+            
+            <div class="sidebar-heading">Pengaturan Sistem</div>
+
+            <!-- Manajemen User -->
             <li class="nav-item {{ request()->is('manajemen-user*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('manajemen-user.index') }}">
                     <i class="fas fa-fw fa-users"></i>
                     <span>Manajemen User</span>
+                </a>
+            </li>
+
+            <!-- Log Aktivitas -->
+            <li class="nav-item {{ request()->is('log-aktivitas*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('log-aktivitas.index') }}">
+                    <i class="fas fa-fw fa-history"></i>
+                    <span>Log Aktivitas</span>
                 </a>
             </li>
             @endif
@@ -192,7 +210,7 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    {{ auth()->user()->nama_user }}
+                                    {{ auth()->user()->nama_user }} ({{ auth()->user()->role }})
                                 </span>
                                 <i class="fas fa-user-circle fa-lg text-primary"></i>
                             </a>

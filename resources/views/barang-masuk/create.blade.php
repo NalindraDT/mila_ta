@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title', 'Tambah Barang Masuk')
+@section('page-title', 'Request Barang Masuk')
 
 @php
     $barangJs = $barang->map(function ($b) {
@@ -20,7 +20,7 @@
 @section('content')
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Tambah Barang Masuk</h1>
+    <h1 class="h3 mb-0 text-gray-800">Request Barang Masuk</h1>
     <a href="{{ route('barang-masuk.index') }}" class="btn btn-secondary btn-sm shadow-sm">
         <i class="fas fa-arrow-left fa-sm mr-1"></i> Kembali
     </a>
@@ -29,10 +29,11 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex align-items-center">
         <i class="fas fa-arrow-circle-down mr-2 text-success"></i>
-        <h6 class="m-0 font-weight-bold text-success">Form Tambah Barang Masuk</h6>
+        <h6 class="m-0 font-weight-bold text-success">Form Request Barang Masuk</h6>
     </div>
     <div class="card-body">
-        <form action="{{ route('barang-masuk.store') }}" method="POST" id="formBarangMasuk">
+        <!-- WAJIB: tambahkan enctype agar bisa upload file -->
+        <form action="{{ route('barang-masuk.store') }}" method="POST" id="formBarangMasuk" enctype="multipart/form-data">
             @csrf
 
             <!-- Filter Kategori -->
@@ -60,56 +61,71 @@
                 @enderror
             </div>
 
-            <!-- Satuan (readonly, otomatis) -->
-            <div class="form-group">
-                <label>Satuan</label>
-                <input type="text" class="form-control" id="satuan_barang"
-                    value="-" readonly style="background-color: #f8f9fc;">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Satuan (readonly, otomatis) -->
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <input type="text" class="form-control" id="satuan_barang"
+                            value="-" readonly style="background-color: #f8f9fc;">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <!-- Stok Sekarang (readonly) -->
+                    <div class="form-group">
+                        <label>Stok Saat Ini</label>
+                        <input type="text" class="form-control" id="stok_sekarang"
+                            value="-" readonly style="background-color: #f8f9fc;">
+                    </div>
+                </div>
             </div>
 
-            <!-- Stok Sekarang (readonly) -->
-            <div class="form-group">
-                <label>Stok Sekarang</label>
-                <input type="text" class="form-control" id="stok_sekarang"
-                    value="-" readonly style="background-color: #f8f9fc;">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Lokasi (readonly, otomatis dari barang) -->
+                    <div class="form-group">
+                        <label>Lokasi Penyimpanan</label>
+                        <input type="text" class="form-control" id="lokasi_barang"
+                            value="-" readonly style="background-color: #f8f9fc;">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <!-- Rak (readonly, otomatis dari barang) -->
+                    <div class="form-group">
+                        <label>Rak</label>
+                        <input type="text" class="form-control" id="rak_barang"
+                            value="-" readonly style="background-color: #f8f9fc;">
+                        <input type="hidden" id="id_rak" name="id_rak">
+                        @error('id_rak')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
             </div>
 
-            <!-- Lokasi (readonly, otomatis dari barang) -->
-            <div class="form-group">
-                <label>Lokasi Penyimpanan</label>
-                <input type="text" class="form-control" id="lokasi_barang"
-                    value="-" readonly style="background-color: #f8f9fc;">
-            </div>
-
-            <!-- Rak (readonly, otomatis dari barang) -->
-            <div class="form-group">
-                <label>Rak</label>
-                <input type="text" class="form-control" id="rak_barang"
-                    value="-" readonly style="background-color: #f8f9fc;">
-                <input type="hidden" id="id_rak" name="id_rak">
-                @error('id_rak')
-                    <div class="text-danger small mt-1">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <!-- Jumlah Masuk -->
-            <div class="form-group">
-                <label for="jumlah_masuk">Jumlah Masuk</label>
-                <input type="number"
-                    class="form-control @error('jumlah_masuk') is-invalid @enderror"
-                    id="jumlah_masuk" name="jumlah_masuk"
-                    value="{{ old('jumlah_masuk') }}"
-                    min="1" placeholder="Masukkan jumlah barang masuk">
-                @error('jumlah_masuk')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <!-- Total Stok (otomatis) -->
-            <div class="form-group">
-                <label>Total Stok Setelah Masuk</label>
-                <input type="text" class="form-control" id="total_stok"
-                    value="-" readonly style="background-color: #f8f9fc;">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Jumlah Masuk -->
+                    <div class="form-group">
+                        <label for="jumlah_masuk">Jumlah Masuk</label>
+                        <input type="number"
+                            class="form-control @error('jumlah_masuk') is-invalid @enderror"
+                            id="jumlah_masuk" name="jumlah_masuk"
+                            value="{{ old('jumlah_masuk') }}"
+                            min="1" placeholder="Masukkan jumlah barang masuk">
+                        @error('jumlah_masuk')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <!-- Total Stok Sementara (otomatis) -->
+                    <div class="form-group">
+                        <label>Estimasi Total Stok Nanti</label>
+                        <input type="text" class="form-control text-success font-weight-bold" id="total_stok"
+                            value="-" readonly style="background-color: #f8f9fc;">
+                    </div>
+                </div>
             </div>
 
             <!-- Tanggal -->
@@ -125,10 +141,29 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save mr-1"></i> Simpan
+            <!-- Foto Bukti -->
+            <div class="form-group mt-4 p-3 border rounded" style="background-color: #fcfcfc;">
+                <label for="foto_bukti" class="font-weight-bold text-info"><i class="fas fa-camera mr-1"></i> Foto Bukti Transaksi (Wajib)</label>
+                <input type="file" 
+                    class="form-control-file @error('foto_bukti') is-invalid @enderror" 
+                    id="foto_bukti" name="foto_bukti" 
+                    accept="image/png, image/jpeg, image/jpg" required>
+                <small class="text-muted d-block mt-1">Format: JPG, JPEG, PNG. Maksimal ukuran 5MB.</small>
+                
+                @error('foto_bukti')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
+
+                <!-- Area Preview Foto -->
+                <div class="mt-3">
+                    <img id="preview-foto" src="" alt="Preview" style="max-height: 200px; display: none; border-radius: 8px; border: 1px solid #ddd; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">
+                <i class="fas fa-paper-plane mr-1"></i> Kirim Request
             </button>
-            <a href="{{ route('barang-masuk.index') }}" class="btn btn-light ml-2">Batal</a>
+            <a href="{{ route('barang-masuk.index') }}" class="btn btn-light mt-3 ml-2">Batal</a>
 
         </form>
     </div>
@@ -143,7 +178,6 @@
 
 <script>
     const semuaBarang = @json($barangJs);
-
     const oldIdBarang = "{{ old('id_barang') }}";
 
     function renderOpsiBarang(kategori, selectedId = null) {
@@ -225,6 +259,20 @@
             renderOpsiBarang(kategoriAwal, oldIdBarang || null);
             if (oldIdBarang) isiOtomatisDariBarang();
         }
+
+        // Script untuk Live Preview Foto
+        $('#foto_bukti').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#preview-foto').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(file);
+            } else {
+                $('#preview-foto').hide();
+            }
+        });
     });
 
     $('#kategori_filter').on('change', function() {
@@ -245,7 +293,7 @@
 
     document.getElementById('jumlah_masuk').addEventListener('input', hitungTotal);
 
-    // Validasi: kategori wajib dipilih sebelum submit
+    // Validasi submit
     document.getElementById('formBarangMasuk').addEventListener('submit', function(e) {
         const kategoriFilter = document.getElementById('kategori_filter');
         if (!kategoriFilter.value) {

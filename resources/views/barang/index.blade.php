@@ -6,7 +6,7 @@
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Data Barang</h1>
-    @if(auth()->user()->role == 'Administrator')
+    @if(auth()->user()->role == 'Kepala Gudang')
     <a href="{{ route('barang.create') }}" class="btn btn-primary btn-sm shadow-sm">
         <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Tambah Barang
     </a>
@@ -102,7 +102,7 @@
                                         )">
                                         <i class="fas fa-eye"></i> Detail
                                     </button>
-                                    @if(auth()->user()->role == 'Administrator')
+                                    @if(auth()->user()->role == 'Kepala Gudang')
                                     <a href="{{ route('barang.edit', $b->id_barang) }}"
                                         class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Edit
@@ -187,7 +187,7 @@
                                         )">
                                         <i class="fas fa-eye"></i> Detail
                                     </button>
-                                    @if(auth()->user()->role == 'Administrator')
+                                    @if(auth()->user()->role == 'Kepala Gudang')
                                     <a href="{{ route('barang.edit', $b->id_barang) }}"
                                         class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Edit

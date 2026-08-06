@@ -29,7 +29,7 @@
                     value="{{ old('nama_user') }}"
                     placeholder="Contoh: Administrator">
                 @error('nama_user')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -43,7 +43,7 @@
                     autocomplete="new-password"
                     placeholder="Minimal 5 karakter, huruf/angka/underscore">
                 @error('username')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -62,7 +62,7 @@
                         </button>
                     </div>
                     @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
@@ -72,12 +72,12 @@
                 <select class="form-control @error('role') is-invalid @enderror"
                     id="role"
                     name="role">
-                    <option value="">-- Pilih Role --</option>
-                    <option value="Administrator" {{ old('role') == 'Administrator' ? 'selected' : '' }}>Administrator</option>
                     <option value="Kepala Gudang" {{ old('role') == 'Kepala Gudang' ? 'selected' : '' }}>Kepala Gudang</option>
+                    <option value="Admin Gudang" {{ old('role') == 'Admin Gudang' ? 'selected' : '' }}>Admin Gudang</option>
+                    <option value="Staff" {{ old('role') == 'Staff' ? 'selected' : '' }}>Staff</option>
                 </select>
                 @error('role')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 

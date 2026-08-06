@@ -30,7 +30,7 @@
                     value="{{ old('nama_user', $user->nama_user) }}"
                     placeholder="Contoh: Administrator">
                 @error('nama_user')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -43,7 +43,7 @@
                     value="{{ old('username', $user->username) }}"
                     placeholder="Minimal 5 karakter, huruf/angka/underscore">
                 @error('username')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -61,7 +61,7 @@
                         </button>
                     </div>
                     @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
@@ -72,11 +72,12 @@
                     id="role"
                     name="role">
                     <option value="">-- Pilih Role --</option>
-                    <option value="Administrator" {{ old('role', $user->role) == 'Administrator' ? 'selected' : '' }}>Administrator</option>
                     <option value="Kepala Gudang" {{ old('role', $user->role) == 'Kepala Gudang' ? 'selected' : '' }}>Kepala Gudang</option>
+                    <option value="Admin Gudang" {{ old('role', $user->role) == 'Admin Gudang' ? 'selected' : '' }}>Admin Gudang</option>
+                    <option value="Staff" {{ old('role', $user->role) == 'Staff' ? 'selected' : '' }}>Staff</option>
                 </select>
                 @error('role')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
